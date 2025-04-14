@@ -94,8 +94,8 @@ namespace Library.Data.DataGenerators
                 var eventType = (EventType)(_random.Next(8));
                 var bookCopy = bookCopies[_random.Next(bookCopies.Count)];
                 var book = books.Find(b => b.ISBN == bookCopy.ISBN);
-                var userId = eventType == EventType.BookBorrowed || eventType == EventType.BookReturned ?
-                    _random.Next(1, users.Count + 1) : null;
+                int? userId = eventType == EventType.BookBorrowed || eventType == EventType.BookReturned ?
+    _random.Next(1, users.Count + 1) : null;
 
                 events.Add(new LibraryEvent
                 {

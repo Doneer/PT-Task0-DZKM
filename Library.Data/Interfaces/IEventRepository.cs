@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Interfaces
 {
-    internal interface IEventRepository
+    public interface IEventRepository
     {
         IEnumerable<LibraryEvent> GetAllEvents();
         LibraryEvent GetEventById(int id);

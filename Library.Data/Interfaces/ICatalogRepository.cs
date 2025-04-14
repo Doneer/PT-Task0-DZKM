@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Interfaces
 {
-    internal interface ICatalogRepository
+    public interface ICatalogRepository
     {
         IEnumerable<Book> GetAllBooks();
         Book GetBookById(string isbn);

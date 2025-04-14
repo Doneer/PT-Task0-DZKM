@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Interfaces
 {
-    internal interface IStateRepository
+    public interface IStateRepository
     {
         IEnumerable<BookCopy> GetAllBookCopies();
         BookCopy GetBookCopyById(int id);

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Models
 {
-    internal class LibraryEvent
+    public class LibraryEvent
     {
         public int Id { get; set; }
         public EventType Type { get; set; }
         public int? UserId { get; set; }
-        public string ISBN { get; set; }
+        public string? ISBN { get; set; }
         public int? BookCopyId { get; set; }
         public DateTime Timestamp { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 
     public enum EventType
@@ -23,6 +23,7 @@ namespace Library.Data.Models
         BookRemoved,
         BookBorrowed,
         BookReturned,
+        BookLost,
         UserRegistered,
         UserRemoved,
         FineAssessed,
