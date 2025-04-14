@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Library.Data.Interfaces
 {
-    internal interface IDataRepository
+    public interface IDataRepository
     {
+        IUserRepository Users { get; }
+        ICatalogRepository Catalog { get; }
+        IStateRepository State { get; }
+        IEventRepository Events { get; }
     }
 }

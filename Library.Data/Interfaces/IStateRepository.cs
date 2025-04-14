@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,12 @@ namespace Library.Data.Interfaces
 {
     internal interface IStateRepository
     {
+        IEnumerable<BookCopy> GetAllBookCopies();
+        BookCopy GetBookCopyById(int id);
+        IEnumerable<BookCopy> GetAvailableBooks();
+        IEnumerable<BookCopy> GetCheckedOutBooks();
+        void AddBookCopy(BookCopy bookCopy);
+        void UpdateBookCopy(BookCopy bookCopy);
+        void DeleteBookCopy(int id);
     }
 }
