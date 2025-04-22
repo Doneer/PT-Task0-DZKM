@@ -1,4 +1,4 @@
-﻿using Library.Tests.DataGenerators;
+﻿using Library.Data.Repositories;
 using Library.Logic.Services;
 using System;
 using System.Linq;
@@ -12,7 +12,11 @@ namespace Library.App
             Console.WriteLine("Library Management System");
             Console.WriteLine("=========================");
 
-            var dataRepository = new PredefinedDataGenerator().GenerateData();
+            var dataRepository = new DataRepository(
+                new UserRepository(),
+                new CatalogRepository(),
+                new StateRepository(),
+                new EventRepository());
             var libraryService = new LibraryService(dataRepository);
 
             bool exit = false;
