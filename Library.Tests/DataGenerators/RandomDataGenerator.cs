@@ -4,9 +4,9 @@ using Library.Data.Repositories;
 using System;
 using System.Collections.Generic;
 
-namespace Library.Data.DataGenerators
+namespace Library.Tests.DataGenerators
 {
-    public class RandomDataGenerator
+    public class RandomDataGenerator 
     {
         private readonly Random _random = new Random();
 
