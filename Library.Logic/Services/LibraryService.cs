@@ -173,7 +173,6 @@ namespace Library.Logic.Services
             if (book == null)
                 throw new InvalidOperationException($"Book with ISBN {bookCopy.ISBN} not found in catalog");
 
-            // Create a new BookCopy with updated properties
             var updatedBookCopy = _modelFactory.CreateBookCopy(
                 bookCopy.Id,
                 bookCopy.ISBN,
@@ -214,7 +213,6 @@ namespace Library.Logic.Services
             var userId = bookCopy.CurrentBorrowerId;
             var user = _dataRepository.Users.GetUserById(userId.Value);
 
-            // Create a new BookCopy with updated properties
             var updatedBookCopy = _modelFactory.CreateBookCopy(
                 bookCopy.Id,
                 bookCopy.ISBN,
