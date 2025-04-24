@@ -9,10 +9,10 @@ namespace Library.Data.Interfaces
 {
     public interface IEventRepository
     {
-        IEnumerable<LibraryEvent> GetAllEvents();
-        LibraryEvent GetEventById(int id);
-        IEnumerable<LibraryEvent> GetEventsByUser(int userId);
-        IEnumerable<LibraryEvent> GetEventsByBook(string isbn);
-        void AddEvent(LibraryEvent libraryEvent);
+        IEnumerable<ILibraryEvent> GetAllEvents();
+        ILibraryEvent GetEventById(int id);
+        IEnumerable<ILibraryEvent> GetEventsByUser(int userId);
+        IEnumerable<ILibraryEvent> GetEventsByBook(string isbn);
+        void AddEvent(ILibraryEvent libraryEvent);
     }
 }

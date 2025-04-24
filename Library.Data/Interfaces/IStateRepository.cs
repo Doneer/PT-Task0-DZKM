@@ -9,12 +9,12 @@ namespace Library.Data.Interfaces
 {
     public interface IStateRepository
     {
-        IEnumerable<BookCopy> GetAllBookCopies();
-        BookCopy GetBookCopyById(int id);
-        IEnumerable<BookCopy> GetAvailableBooks();
-        IEnumerable<BookCopy> GetCheckedOutBooks();
-        void AddBookCopy(BookCopy bookCopy);
-        void UpdateBookCopy(BookCopy bookCopy);
+        IEnumerable<IBookCopy> GetAllBookCopies();
+        IBookCopy GetBookCopyById(int id);
+        IEnumerable<IBookCopy> GetAvailableBooks();
+        IEnumerable<IBookCopy> GetCheckedOutBooks();
+        void AddBookCopy(IBookCopy bookCopy);
+        void UpdateBookCopy(IBookCopy bookCopy);
         void DeleteBookCopy(int id);
     }
 }

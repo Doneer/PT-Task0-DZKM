@@ -10,9 +10,9 @@ namespace Library.Data.Interfaces
     public interface IUserRepository
     {
         IEnumerable<User> GetAllUsers();
-        User GetUserById(int id);
-        void AddUser(User user);
-        void UpdateUser(User user);
+        IUser GetUserById(int id);
+        void AddUser(IUser user);
+        void UpdateUser(IUser user);
         void DeleteUser(int id);
     }
 }

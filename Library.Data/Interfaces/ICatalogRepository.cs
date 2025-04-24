@@ -9,10 +9,10 @@ namespace Library.Data.Interfaces
 {
     public interface ICatalogRepository
     {
-        IEnumerable<Book> GetAllBooks();
-        Book GetBookById(string isbn);
-        void AddBook(Book book);
-        void UpdateBook(Book book);
+        IEnumerable<IBook> GetAllBooks();
+        IBook GetBookById(string isbn);
+        void AddBook(IBook book);
+        void UpdateBook(IBook book);
         void DeleteBook(string isbn);
     }
 }
