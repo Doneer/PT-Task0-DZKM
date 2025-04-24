@@ -1,12 +1,15 @@
-﻿using Library.Data.Interfaces;
+﻿using Library.Data.Factories;
+using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
 using Library.Data.Models;
 using Library.Data.Repositories;
 using System;
 using System.Collections.Generic;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Library.Tests.DataGenerators
 {
-    public class RandomDataGenerator 
+    public class RandomDataGenerator
     {
         private readonly Random _random = new Random();
 
@@ -25,88 +28,86 @@ namespace Library.Tests.DataGenerators
             );
         }
 
-        private List<User> GenerateUsers(int count)
+        private List<IUser> GenerateUsers(int count)
         {
-            var users = new List<User>();
+            var users = new List<IUser>();
             for (int i = 1; i <= count; i++)
             {
-                users.Add(new User
-                {
-                    Id = i,
-                    Name = $"User {i}",
-                    Email = $"user{i}@example.com",
-                    PhoneNumber = $"555-{i:D4}",
-                    Type = (UserType)(_random.Next(3)),
-                    RegistrationDate = DateTime.Now.AddDays(-_random.Next(365))
-                });
+                users.Add(UserFactory.CreateUser(
+                    i,
+                    $"User {i}",
+                    $"user{i}@example.com",
+                    $"555-{i:D4}",
+                    (UserType)(_random.Next(3)),
+                    DateTime.Now.AddDays(-_random.Next(365))
+                ));
             }
             return users;
         }
 
-        private List<Book> GenerateBooks(int count)
+        private List<IBook> GenerateBooks(int count)
         {
-            var books = new List<Book>();
+            var books = new List<IBook>();
             string[] genres = { "Fiction", "Mystery", "Science Fiction", "Fantasy", "Biography", "History" };
             string[] authors = { "John Smith", "Jane Doe", "Michael Johnson", "Emily Brown", "Robert Wilson" };
             string[] publishers = { "Penguin", "Harper Collins", "Simon & Schuster", "Random House" };
 
             for (int i = 1; i <= count; i++)
             {
-                books.Add(new Book
-                {
-                    ISBN = $"ISBN-{i:D5}",
-                    Title = $"Book Title {i}",
-                    Author = authors[_random.Next(authors.Length)],
-                    Publisher = publishers[_random.Next(publishers.Length)],
-                    PublicationYear = 2000 + _random.Next(23),
-                    Genre = genres[_random.Next(genres.Length)],
-                    Description = $"Description for book {i}"
-                });
+                books.Add(BookFactory.CreateBook(
+                    $"ISBN-{i:D5}",
+                    $"Book Title {i}",
+                    authors[_random.Next(authors.Length)],
+                    publishers[_random.Next(publishers.Length)],
+                    2000 + _random.Next(23),
+                    genres[_random.Next(genres.Length)],
+                    $"Description for book {i}"
+                ));
             }
             return books;
         }
 
-        private List<BookCopy> GenerateBookCopies(List<Book> books, int count)
+        private List<IBookCopy> GenerateBookCopies(List<IBook> books, int count)
         {
-            var bookCopies = new List<BookCopy>();
+            var bookCopies = new List<IBookCopy>();
             for (int i = 1; i <= count; i++)
             {
                 var status = (BookStatus)(_random.Next(4));
-                bookCopies.Add(new BookCopy
-                {
-                    Id = i,
-                    ISBN = books[_random.Next(books.Count)].ISBN,
-                    Status = status,
-                    AcquisitionDate = DateTime.Now.AddDays(-_random.Next(500)),
-                    Location = $"Shelf {_random.Next(1, 20)}",
-                    CurrentBorrowerId = status == BookStatus.CheckedOut ? _random.Next(1, 11) : null,
-                    DueDate = status == BookStatus.CheckedOut ? DateTime.Now.AddDays(_random.Next(14)) : null
-                });
+                var bookISBN = books[_random.Next(books.Count)].ISBN;
+
+                bookCopies.Add(BookCopyFactory.CreateBookCopy(
+                    i,
+                    bookISBN,
+                    status,
+                    DateTime.Now.AddDays(-_random.Next(500)),
+                    $"Shelf {_random.Next(1, 20)}",
+                    status == BookStatus.CheckedOut ? _random.Next(1, 11) : null,
+                    status == BookStatus.CheckedOut ? DateTime.Now.AddDays(_random.Next(14)) : null
+                ));
             }
             return bookCopies;
         }
 
-        private List<LibraryEvent> GenerateEvents(List<User> users, List<Book> books, List<BookCopy> bookCopies, int count)
+        private List<ILibraryEvent> GenerateEvents(List<IUser> users, List<IBook> books, List<IBookCopy> bookCopies, int count)
         {
-            var events = new List<LibraryEvent>();
+            var events = new List<ILibraryEvent>();
             for (int i = 1; i <= count; i++)
             {
                 var eventType = (EventType)(_random.Next(8));
                 var bookCopy = bookCopies[_random.Next(bookCopies.Count)];
-                var book = books.Find(b => b.ISBN == bookCopy.ISBN);
+                var book = books.FirstOrDefault(b => b.ISBN == bookCopy.ISBN);
                 int? userId = eventType == EventType.BookBorrowed || eventType == EventType.BookReturned ?
-    _random.Next(1, users.Count + 1) : null;
+                    _random.Next(1, users.Count + 1) : null;
 
-                events.Add(new LibraryEvent
-                {
-                    Id = i,
-                    Type = eventType,
-                    UserId = userId,
-                    ISBN = book.ISBN,
-                    BookCopyId = bookCopy.Id,
-                    Timestamp = DateTime.Now.AddDays(-_random.Next(30)),
-                    Description = $"{eventType} event for book {book.Title}"
-                });
+                events.Add(LibraryEventFactory.CreateEvent(
+                    i,
+                    eventType,
+                    DateTime.Now.AddDays(-_random.Next(30)),
+                    $"{eventType} event for book {book.Title}",
+                    userId,
+                    bookCopy.ISBN,
+                    bookCopy.Id
+                ));
             }
             return events;
         }

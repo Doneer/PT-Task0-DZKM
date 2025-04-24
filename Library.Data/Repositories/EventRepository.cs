@@ -1,20 +1,35 @@
-﻿using System;
+﻿using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
+using Library.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Library.Data.Interfaces;
-using Library.Data.Models;
 
 namespace Library.Data.Repositories
 {
     public class EventRepository : IEventRepository
     {
         private readonly List<LibraryEvent> _events;
-        private readonly IModelFactory _modelFactory;
 
-        public EventRepository(List<LibraryEvent> initialEvents = null)
+        public EventRepository(IEnumerable<ILibraryEvent> initialEvents = null)
         {
-            _events = initialEvents ?? new List<LibraryEvent>();
-            _modelFactory = new Factories.ModelFactory();
+            _events = new List<LibraryEvent>();
+            if (initialEvents != null)
+            {
+                foreach (var evt in initialEvents)
+                {
+                    _events.Add(new LibraryEvent
+                    {
+                        Id = evt.Id,
+                        Type = evt.Type,
+                        UserId = evt.UserId,
+                        ISBN = evt.ISBN,
+                        BookCopyId = evt.BookCopyId,
+                        Timestamp = evt.Timestamp,
+                        Description = evt.Description
+                    });
+                }
+            }
         }
 
         public IEnumerable<ILibraryEvent> GetAllEvents() => _events.Cast<ILibraryEvent>().ToList();
@@ -34,23 +49,18 @@ namespace Library.Data.Repositories
                 throw new ArgumentException($"Event with ID {libraryEvent.Id} already exists.");
             }
 
-            if (libraryEvent is LibraryEvent concreteEvent)
+            var internalEvent = new LibraryEvent
             {
-                _events.Add(concreteEvent);
-            }
-            else
-            {
-                _events.Add(new LibraryEvent
-                {
-                    Id = libraryEvent.Id,
-                    Type = libraryEvent.Type,
-                    UserId = libraryEvent.UserId,
-                    ISBN = libraryEvent.ISBN,
-                    BookCopyId = libraryEvent.BookCopyId,
-                    Timestamp = libraryEvent.Timestamp,
-                    Description = libraryEvent.Description
-                });
-            }
+                Id = libraryEvent.Id,
+                Type = libraryEvent.Type,
+                UserId = libraryEvent.UserId,
+                ISBN = libraryEvent.ISBN,
+                BookCopyId = libraryEvent.BookCopyId,
+                Timestamp = libraryEvent.Timestamp,
+                Description = libraryEvent.Description
+            };
+
+            _events.Add(internalEvent);
         }
     }
 }

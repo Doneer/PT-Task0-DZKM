@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Library.Data.Factories;
+﻿using Library.Data.Factories;
 using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
 using Library.Data.Models;
 using Library.Logic.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.Logic.Services
 {
     public class LibraryService : ILibraryService
     {
         private readonly IDataRepository _dataRepository;
-        private readonly IModelFactory _modelFactory;
 
         public LibraryService(IDataRepository dataRepository)
         {
             _dataRepository = dataRepository;
-            _modelFactory = new Data.Factories.ModelFactory();
         }
 
         public IEnumerable<IUser> GetAllUsers()
@@ -31,17 +30,23 @@ namespace Library.Logic.Services
 
         public void RegisterUser(IUser user)
         {
-            user.RegistrationDate = DateTime.Now;
-            _dataRepository.Users.AddUser(user);
+            var newUser = UserFactory.CreateUser(
+                user.Id,
+                user.Name,
+                user.Email,
+                user.PhoneNumber,
+                user.Type,
+                DateTime.Now
+            );
 
-            var newEvent = _modelFactory.CreateLibraryEvent(
+            _dataRepository.Users.AddUser(newUser);
+
+            var newEvent = LibraryEventFactory.CreateEvent(
                 GetNextEventId(),
                 EventType.UserRegistered,
-                user.Id,
-                null,
-                null,
                 DateTime.Now,
-                $"User {user.Name} registered"
+                $"User {user.Name} registered",
+                user.Id
             );
 
             _dataRepository.Events.AddEvent(newEvent);
@@ -64,14 +69,12 @@ namespace Library.Logic.Services
 
             _dataRepository.Users.DeleteUser(id);
 
-            var newEvent = _modelFactory.CreateLibraryEvent(
+            var newEvent = LibraryEventFactory.CreateEvent(
                 GetNextEventId(),
                 EventType.UserRemoved,
-                id,
-                null,
-                null,
                 DateTime.Now,
-                $"User {user.Name} removed"
+                $"User {user.Name} removed",
+                id
             );
 
             _dataRepository.Events.AddEvent(newEvent);
@@ -139,18 +142,24 @@ namespace Library.Logic.Services
             if (book == null)
                 throw new ArgumentException($"Book with ISBN {bookCopy.ISBN} not found in catalog");
 
-            bookCopy.AcquisitionDate = DateTime.Now;
-            bookCopy.Status = BookStatus.Available;
-            _dataRepository.State.AddBookCopy(bookCopy);
+            var newBookCopy = BookCopyFactory.CreateBookCopy(
+                bookCopy.Id,
+                bookCopy.ISBN,
+                BookStatus.Available,
+                DateTime.Now,
+                bookCopy.Location
+            );
 
-            var newEvent = _modelFactory.CreateLibraryEvent(
+            _dataRepository.State.AddBookCopy(newBookCopy);
+
+            var newEvent = LibraryEventFactory.CreateEvent(
                 GetNextEventId(),
                 EventType.BookAdded,
+                DateTime.Now,
+                $"Added new copy of {book.Title}",
                 null,
                 bookCopy.ISBN,
-                bookCopy.Id,
-                DateTime.Now,
-                $"Added new copy of {book.Title}"
+                bookCopy.Id
             );
 
             _dataRepository.Events.AddEvent(newEvent);
@@ -173,7 +182,7 @@ namespace Library.Logic.Services
             if (book == null)
                 throw new InvalidOperationException($"Book with ISBN {bookCopy.ISBN} not found in catalog");
 
-            var updatedBookCopy = _modelFactory.CreateBookCopy(
+            var updatedBookCopy = BookCopyFactory.CreateBookCopy(
                 bookCopy.Id,
                 bookCopy.ISBN,
                 BookStatus.CheckedOut,
@@ -185,14 +194,14 @@ namespace Library.Logic.Services
 
             _dataRepository.State.UpdateBookCopy(updatedBookCopy);
 
-            var newEvent = _modelFactory.CreateLibraryEvent(
+            var newEvent = LibraryEventFactory.CreateEvent(
                 GetNextEventId(),
                 EventType.BookBorrowed,
+                DateTime.Now,
+                $"{user.Name} borrowed {book.Title}",
                 userId,
                 bookCopy.ISBN,
-                bookCopyId,
-                DateTime.Now,
-                $"{user.Name} borrowed {book.Title}"
+                bookCopyId
             );
 
             _dataRepository.Events.AddEvent(newEvent);
@@ -213,7 +222,7 @@ namespace Library.Logic.Services
             var userId = bookCopy.CurrentBorrowerId;
             var user = _dataRepository.Users.GetUserById(userId.Value);
 
-            var updatedBookCopy = _modelFactory.CreateBookCopy(
+            var updatedBookCopy = BookCopyFactory.CreateBookCopy(
                 bookCopy.Id,
                 bookCopy.ISBN,
                 BookStatus.Available,
@@ -223,28 +232,28 @@ namespace Library.Logic.Services
 
             _dataRepository.State.UpdateBookCopy(updatedBookCopy);
 
-            var newEvent = _modelFactory.CreateLibraryEvent(
+            var newEvent = LibraryEventFactory.CreateEvent(
                 GetNextEventId(),
                 EventType.BookReturned,
+                DateTime.Now,
+                $"{user.Name} returned {book.Title}",
                 userId,
                 bookCopy.ISBN,
-                bookCopyId,
-                DateTime.Now,
-                $"{user.Name} returned {book.Title}"
+                bookCopyId
             );
 
             _dataRepository.Events.AddEvent(newEvent);
 
             if (bookCopy.DueDate.HasValue && bookCopy.DueDate.Value < DateTime.Now)
             {
-                var overdueEvent = _modelFactory.CreateLibraryEvent(
+                var overdueEvent = LibraryEventFactory.CreateEvent(
                     GetNextEventId(),
                     EventType.FineAssessed,
+                    DateTime.Now,
+                    $"Fine assessed for overdue book {book.Title}",
                     userId,
                     bookCopy.ISBN,
-                    bookCopyId,
-                    DateTime.Now,
-                    $"Fine assessed for overdue book {book.Title}"
+                    bookCopyId
                 );
 
                 _dataRepository.Events.AddEvent(overdueEvent);

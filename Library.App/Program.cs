@@ -1,4 +1,7 @@
-﻿using Library.Data.Repositories;
+﻿using Library.Data.Factories;
+using Library.Data.Interfaces.Models;
+using Library.Data.Models;
+using Library.Data.Repositories;
 using Library.Logic.Services;
 using System;
 using System.Linq;
@@ -295,7 +298,6 @@ namespace Library.App
                 var borrower = libraryService.GetUserById(checkedOutBooks[i].CurrentBorrowerId.Value);
                 Console.WriteLine($"{i + 1}. {book.Title} (Copy ID: {checkedOutBooks[i].Id}, Borrowed by: {borrower.Name})");
             }
-
 
             Console.Write("\nSelect book to return (enter number): ");
             if (!int.TryParse(Console.ReadLine(), out int bookSelection) ||

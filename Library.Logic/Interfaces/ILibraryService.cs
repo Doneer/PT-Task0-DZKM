@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Library.Data.Interfaces.Models;
+using System;
 using System.Collections.Generic;
-using Library.Data.Interfaces;
-using Library.Data.Models;
 
 namespace Library.Logic.Interfaces
 {

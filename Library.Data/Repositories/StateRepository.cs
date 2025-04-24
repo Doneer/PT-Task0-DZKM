@@ -1,20 +1,35 @@
-﻿using System;
+﻿using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
+using Library.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Library.Data.Interfaces;
-using Library.Data.Models;
 
 namespace Library.Data.Repositories
 {
     public class StateRepository : IStateRepository
     {
         private readonly List<BookCopy> _bookCopies;
-        private readonly IModelFactory _modelFactory;
 
-        public StateRepository(List<BookCopy> initialBookCopies = null)
+        public StateRepository(IEnumerable<IBookCopy> initialBookCopies = null)
         {
-            _bookCopies = initialBookCopies ?? new List<BookCopy>();
-            _modelFactory = new Factories.ModelFactory();
+            _bookCopies = new List<BookCopy>();
+            if (initialBookCopies != null)
+            {
+                foreach (var copy in initialBookCopies)
+                {
+                    _bookCopies.Add(new BookCopy
+                    {
+                        Id = copy.Id,
+                        ISBN = copy.ISBN,
+                        Status = copy.Status,
+                        AcquisitionDate = copy.AcquisitionDate,
+                        Location = copy.Location,
+                        CurrentBorrowerId = copy.CurrentBorrowerId,
+                        DueDate = copy.DueDate
+                    });
+                }
+            }
         }
 
         public IEnumerable<IBookCopy> GetAllBookCopies() => _bookCopies.Cast<IBookCopy>().ToList();
@@ -34,23 +49,18 @@ namespace Library.Data.Repositories
                 throw new ArgumentException($"Book copy with ID {bookCopy.Id} already exists.");
             }
 
-            if (bookCopy is BookCopy concreteBookCopy)
+            var internalBookCopy = new BookCopy
             {
-                _bookCopies.Add(concreteBookCopy);
-            }
-            else
-            {
-                _bookCopies.Add(new BookCopy
-                {
-                    Id = bookCopy.Id,
-                    ISBN = bookCopy.ISBN,
-                    Status = bookCopy.Status,
-                    AcquisitionDate = bookCopy.AcquisitionDate,
-                    Location = bookCopy.Location,
-                    CurrentBorrowerId = bookCopy.CurrentBorrowerId,
-                    DueDate = bookCopy.DueDate
-                });
-            }
+                Id = bookCopy.Id,
+                ISBN = bookCopy.ISBN,
+                Status = bookCopy.Status,
+                AcquisitionDate = bookCopy.AcquisitionDate,
+                Location = bookCopy.Location,
+                CurrentBorrowerId = bookCopy.CurrentBorrowerId,
+                DueDate = bookCopy.DueDate
+            };
+
+            _bookCopies.Add(internalBookCopy);
         }
 
         public void UpdateBookCopy(IBookCopy bookCopy)
@@ -63,23 +73,18 @@ namespace Library.Data.Repositories
 
             _bookCopies.Remove(existingBookCopy);
 
-            if (bookCopy is BookCopy concreteBookCopy)
+            var updatedBookCopy = new BookCopy
             {
-                _bookCopies.Add(concreteBookCopy);
-            }
-            else
-            {
-                _bookCopies.Add(new BookCopy
-                {
-                    Id = bookCopy.Id,
-                    ISBN = bookCopy.ISBN,
-                    Status = bookCopy.Status,
-                    AcquisitionDate = bookCopy.AcquisitionDate,
-                    Location = bookCopy.Location,
-                    CurrentBorrowerId = bookCopy.CurrentBorrowerId,
-                    DueDate = bookCopy.DueDate
-                });
-            }
+                Id = bookCopy.Id,
+                ISBN = bookCopy.ISBN,
+                Status = bookCopy.Status,
+                AcquisitionDate = bookCopy.AcquisitionDate,
+                Location = bookCopy.Location,
+                CurrentBorrowerId = bookCopy.CurrentBorrowerId,
+                DueDate = bookCopy.DueDate
+            };
+
+            _bookCopies.Add(updatedBookCopy);
         }
 
         public void DeleteBookCopy(int id)

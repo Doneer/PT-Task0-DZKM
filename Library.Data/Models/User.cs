@@ -1,4 +1,4 @@
-﻿using Library.Data.Interfaces;
+﻿using Library.Data.Interfaces.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

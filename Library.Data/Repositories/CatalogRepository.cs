@@ -1,20 +1,35 @@
-﻿using System;
+﻿using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
+using Library.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Library.Data.Interfaces;
-using Library.Data.Models;
 
 namespace Library.Data.Repositories
 {
     public class CatalogRepository : ICatalogRepository
     {
         private readonly List<Book> _books;
-        private readonly IModelFactory _modelFactory;
 
-        public CatalogRepository(List<Book> initialBooks = null)
+        public CatalogRepository(IEnumerable<IBook> initialBooks = null)
         {
-            _books = initialBooks ?? new List<Book>();
-            _modelFactory = new Factories.ModelFactory();
+            _books = new List<Book>();
+            if (initialBooks != null)
+            {
+                foreach (var book in initialBooks)
+                {
+                    _books.Add(new Book
+                    {
+                        ISBN = book.ISBN,
+                        Title = book.Title,
+                        Author = book.Author,
+                        Publisher = book.Publisher,
+                        PublicationYear = book.PublicationYear,
+                        Genre = book.Genre,
+                        Description = book.Description
+                    });
+                }
+            }
         }
 
         public IEnumerable<IBook> GetAllBooks() => _books.Cast<IBook>().ToList();
@@ -28,23 +43,18 @@ namespace Library.Data.Repositories
                 throw new ArgumentException($"Book with ISBN {book.ISBN} already exists.");
             }
 
-            if (book is Book concreteBook)
+            var internalBook = new Book
             {
-                _books.Add(concreteBook);
-            }
-            else
-            {
-                _books.Add(new Book
-                {
-                    ISBN = book.ISBN,
-                    Title = book.Title,
-                    Author = book.Author,
-                    Publisher = book.Publisher,
-                    PublicationYear = book.PublicationYear,
-                    Genre = book.Genre,
-                    Description = book.Description
-                });
-            }
+                ISBN = book.ISBN,
+                Title = book.Title,
+                Author = book.Author,
+                Publisher = book.Publisher,
+                PublicationYear = book.PublicationYear,
+                Genre = book.Genre,
+                Description = book.Description
+            };
+
+            _books.Add(internalBook);
         }
 
         public void UpdateBook(IBook book)
@@ -57,23 +67,18 @@ namespace Library.Data.Repositories
 
             _books.Remove(existingBook);
 
-            if (book is Book concreteBook)
+            var updatedBook = new Book
             {
-                _books.Add(concreteBook);
-            }
-            else
-            {
-                _books.Add(new Book
-                {
-                    ISBN = book.ISBN,
-                    Title = book.Title,
-                    Author = book.Author,
-                    Publisher = book.Publisher,
-                    PublicationYear = book.PublicationYear,
-                    Genre = book.Genre,
-                    Description = book.Description
-                });
-            }
+                ISBN = book.ISBN,
+                Title = book.Title,
+                Author = book.Author,
+                Publisher = book.Publisher,
+                PublicationYear = book.PublicationYear,
+                Genre = book.Genre,
+                Description = book.Description
+            };
+
+            _books.Add(updatedBook);
         }
 
         public void DeleteBook(string isbn)

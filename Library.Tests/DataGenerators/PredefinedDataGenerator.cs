@@ -1,8 +1,11 @@
-﻿using Library.Data.Interfaces;
+﻿using Library.Data.Factories;
+using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
 using Library.Data.Models;
 using Library.Data.Repositories;
 using System;
 using System.Collections.Generic;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Library.Tests.DataGenerators
 {
@@ -23,57 +26,57 @@ namespace Library.Tests.DataGenerators
             );
         }
 
-        private List<User> GeneratePredefinedUsers()
+        private List<IUser> GeneratePredefinedUsers()
         {
-            return new List<User>
+            return new List<IUser>
             {
-                new User { Id = 1, Name = "John Doe", Email = "john@example.com", PhoneNumber = "555-1234", Type = UserType.Patron, RegistrationDate = new DateTime(2023, 1, 15) },
-                new User { Id = 2, Name = "Jane Smith", Email = "jane@example.com", PhoneNumber = "555-5678", Type = UserType.Patron, RegistrationDate = new DateTime(2023, 2, 20) },
-                new User { Id = 3, Name = "Michael Johnson", Email = "michael@example.com", PhoneNumber = "555-9012", Type = UserType.Librarian, RegistrationDate = new DateTime(2022, 11, 10) },
-                new User { Id = 4, Name = "Emily Brown", Email = "emily@example.com", PhoneNumber = "555-3456", Type = UserType.Administrator, RegistrationDate = new DateTime(2022, 10, 5) }
+                UserFactory.CreateUser(1, "John Doe", "john@example.com", "555-1234", UserType.Patron, new DateTime(2023, 1, 15)),
+                UserFactory.CreateUser(2, "Jane Smith", "jane@example.com", "555-5678", UserType.Patron, new DateTime(2023, 2, 20)),
+                UserFactory.CreateUser(3, "Michael Johnson", "michael@example.com", "555-9012", UserType.Librarian, new DateTime(2022, 11, 10)),
+                UserFactory.CreateUser(4, "Emily Brown", "emily@example.com", "555-3456", UserType.Administrator, new DateTime(2022, 10, 5))
             };
         }
 
-        private List<Book> GeneratePredefinedBooks()
+        private List<IBook> GeneratePredefinedBooks()
         {
-            return new List<Book>
+            return new List<IBook>
             {
-                new Book { ISBN = "978-0-061-12241-5", Title = "To Kill a Mockingbird", Author = "Harper Lee", Publisher = "HarperCollins", PublicationYear = 1960, Genre = "Fiction", Description = "Classic novel about racial injustice" },
-                new Book { ISBN = "978-0-743-27325-1", Title = "The Great Gatsby", Author = "F. Scott Fitzgerald", Publisher = "Scribner", PublicationYear = 1925, Genre = "Fiction", Description = "Classic novel about the American Dream" },
-                new Book { ISBN = "978-0-141-03614-4", Title = "1984", Author = "George Orwell", Publisher = "Penguin", PublicationYear = 1949, Genre = "Science Fiction", Description = "Dystopian novel about totalitarianism" },
-                new Book { ISBN = "978-0-316-76948-0", Title = "The Catcher in the Rye", Author = "J.D. Salinger", Publisher = "Little, Brown", PublicationYear = 1951, Genre = "Fiction", Description = "Novel about teenage alienation" },
-                new Book { ISBN = "978-0-060-85040-2", Title = "The Hobbit", Author = "J.R.R. Tolkien", Publisher = "HarperCollins", PublicationYear = 1937, Genre = "Fantasy", Description = "Fantasy novel about a hobbit's adventure" }
+                BookFactory.CreateBook("978-0-061-12241-5", "To Kill a Mockingbird", "Harper Lee", "HarperCollins", 1960, "Fiction", "Classic novel about racial injustice"),
+                BookFactory.CreateBook("978-0-743-27325-1", "The Great Gatsby", "F. Scott Fitzgerald", "Scribner", 1925, "Fiction", "Classic novel about the American Dream"),
+                BookFactory.CreateBook("978-0-141-03614-4", "1984", "George Orwell", "Penguin", 1949, "Science Fiction", "Dystopian novel about totalitarianism"),
+                BookFactory.CreateBook("978-0-316-76948-0", "The Catcher in the Rye", "J.D. Salinger", "Little, Brown", 1951, "Fiction", "Novel about teenage alienation"),
+                BookFactory.CreateBook("978-0-060-85040-2", "The Hobbit", "J.R.R. Tolkien", "HarperCollins", 1937, "Fantasy", "Fantasy novel about a hobbit's adventure")
             };
         }
 
-        private List<BookCopy> GeneratePredefinedBookCopies()
+        private List<IBookCopy> GeneratePredefinedBookCopies()
         {
-            return new List<BookCopy>
+            return new List<IBookCopy>
             {
-                new BookCopy { Id = 1, ISBN = "978-0-061-12241-5", Status = BookStatus.Available, AcquisitionDate = new DateTime(2022, 5, 12), Location = "Shelf A1" },
-                new BookCopy { Id = 2, ISBN = "978-0-061-12241-5", Status = BookStatus.CheckedOut, AcquisitionDate = new DateTime(2022, 5, 12), Location = "Shelf A1", CurrentBorrowerId = 1, DueDate = DateTime.Now.AddDays(7) },
-                new BookCopy { Id = 3, ISBN = "978-0-743-27325-1", Status = BookStatus.Available, AcquisitionDate = new DateTime(2022, 6, 15), Location = "Shelf A2" },
-                new BookCopy { Id = 4, ISBN = "978-0-141-03614-4", Status = BookStatus.CheckedOut, AcquisitionDate = new DateTime(2022, 7, 20), Location = "Shelf B1", CurrentBorrowerId = 2, DueDate = DateTime.Now.AddDays(3) },
-                new BookCopy { Id = 5, ISBN = "978-0-316-76948-0", Status = BookStatus.UnderMaintenance, AcquisitionDate = new DateTime(2022, 8, 5), Location = "Shelf B2" },
-                new BookCopy { Id = 6, ISBN = "978-0-060-85040-2", Status = BookStatus.Available, AcquisitionDate = new DateTime(2022, 9, 10), Location = "Shelf C1" },
-                new BookCopy { Id = 7, ISBN = "978-0-060-85040-2", Status = BookStatus.Lost, AcquisitionDate = new DateTime(2022, 9, 10), Location = "Unknown" }
+                BookCopyFactory.CreateBookCopy(1, "978-0-061-12241-5", BookStatus.Available, new DateTime(2022, 5, 12), "Shelf A1"),
+                BookCopyFactory.CreateBookCopy(2, "978-0-061-12241-5", BookStatus.CheckedOut, new DateTime(2022, 5, 12), "Shelf A1", 1, DateTime.Now.AddDays(7)),
+                BookCopyFactory.CreateBookCopy(3, "978-0-743-27325-1", BookStatus.Available, new DateTime(2022, 6, 15), "Shelf A2"),
+                BookCopyFactory.CreateBookCopy(4, "978-0-141-03614-4", BookStatus.CheckedOut, new DateTime(2022, 7, 20), "Shelf B1", 2, DateTime.Now.AddDays(3)),
+                BookCopyFactory.CreateBookCopy(5, "978-0-316-76948-0", BookStatus.UnderMaintenance, new DateTime(2022, 8, 5), "Shelf B2"),
+                BookCopyFactory.CreateBookCopy(6, "978-0-060-85040-2", BookStatus.Available, new DateTime(2022, 9, 10), "Shelf C1"),
+                BookCopyFactory.CreateBookCopy(7, "978-0-060-85040-2", BookStatus.Lost, new DateTime(2022, 9, 10), "Unknown")
             };
         }
 
-        private List<LibraryEvent> GeneratePredefinedEvents()
+        private List<ILibraryEvent> GeneratePredefinedEvents()
         {
-            return new List<LibraryEvent>
+            return new List<ILibraryEvent>
             {
-                new LibraryEvent { Id = 1, Type = EventType.BookAdded, ISBN = "978-0-061-12241-5", BookCopyId = 1, Timestamp = new DateTime(2022, 5, 12), Description = "Added new copy of To Kill a Mockingbird" },
-                new LibraryEvent { Id = 2, Type = EventType.BookAdded, ISBN = "978-0-061-12241-5", BookCopyId = 2, Timestamp = new DateTime(2022, 5, 12), Description = "Added new copy of To Kill a Mockingbird" },
-                new LibraryEvent { Id = 3, Type = EventType.BookBorrowed, UserId = 1, ISBN = "978-0-061-12241-5", BookCopyId = 2, Timestamp = DateTime.Now.AddDays(-7), Description = "John Doe borrowed To Kill a Mockingbird" },
-                new LibraryEvent { Id = 4, Type = EventType.BookAdded, ISBN = "978-0-743-27325-1", BookCopyId = 3, Timestamp = new DateTime(2022, 6, 15), Description = "Added new copy of The Great Gatsby" },
-                new LibraryEvent { Id = 5, Type = EventType.BookAdded, ISBN = "978-0-141-03614-4", BookCopyId = 4, Timestamp = new DateTime(2022, 7, 20), Description = "Added new copy of 1984" },
-                new LibraryEvent { Id = 6, Type = EventType.BookBorrowed, UserId = 2, ISBN = "978-0-141-03614-4", BookCopyId = 4, Timestamp = DateTime.Now.AddDays(-10), Description = "Jane Smith borrowed 1984" },
-                new LibraryEvent { Id = 7, Type = EventType.BookAdded, ISBN = "978-0-316-76948-0", BookCopyId = 5, Timestamp = new DateTime(2022, 8, 5), Description = "Added new copy of The Catcher in the Rye" },
-                new LibraryEvent { Id = 8, Type = EventType.BookAdded, ISBN = "978-0-060-85040-2", BookCopyId = 6, Timestamp = new DateTime(2022, 9, 10), Description = "Added new copy of The Hobbit" },
-                new LibraryEvent { Id = 9, Type = EventType.BookAdded, ISBN = "978-0-060-85040-2", BookCopyId = 7, Timestamp = new DateTime(2022, 9, 10), Description = "Added new copy of The Hobbit" },
-                new LibraryEvent { Id = 10, Type = EventType.BookLost, ISBN = "978-0-060-85040-2", BookCopyId = 7, Timestamp = new DateTime(2023, 1, 5), Description = "Copy of The Hobbit marked as lost" }
+                LibraryEventFactory.CreateEvent(1, EventType.BookAdded, new DateTime(2022, 5, 12), "Added new copy of To Kill a Mockingbird", null, "978-0-061-12241-5", 1),
+                LibraryEventFactory.CreateEvent(2, EventType.BookAdded, new DateTime(2022, 5, 12), "Added new copy of To Kill a Mockingbird", null, "978-0-061-12241-5", 2),
+                LibraryEventFactory.CreateEvent(3, EventType.BookBorrowed, DateTime.Now.AddDays(-7), "John Doe borrowed To Kill a Mockingbird", 1, "978-0-061-12241-5", 2),
+                LibraryEventFactory.CreateEvent(4, EventType.BookAdded, new DateTime(2022, 6, 15), "Added new copy of The Great Gatsby", null, "978-0-743-27325-1", 3),
+                LibraryEventFactory.CreateEvent(5, EventType.BookAdded, new DateTime(2022, 7, 20), "Added new copy of 1984", null, "978-0-141-03614-4", 4),
+                LibraryEventFactory.CreateEvent(6, EventType.BookBorrowed, DateTime.Now.AddDays(-10), "Jane Smith borrowed 1984", 2, "978-0-141-03614-4", 4),
+                LibraryEventFactory.CreateEvent(7, EventType.BookAdded, new DateTime(2022, 8, 5), "Added new copy of The Catcher in the Rye", null, "978-0-316-76948-0", 5),
+                LibraryEventFactory.CreateEvent(8, EventType.BookAdded, new DateTime(2022, 9, 10), "Added new copy of The Hobbit", null, "978-0-060-85040-2", 6),
+                LibraryEventFactory.CreateEvent(9, EventType.BookAdded, new DateTime(2022, 9, 10), "Added new copy of The Hobbit", null, "978-0-060-85040-2", 7),
+                LibraryEventFactory.CreateEvent(10, EventType.BookLost, new DateTime(2023, 1, 5), "Copy of The Hobbit marked as lost", null, "978-0-060-85040-2", 7)
             };
         }
     }

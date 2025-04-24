@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
 using Library.Data.Models;
 using Library.Data.Repositories;
+using Library.Data.Factories;
 using Library.Logic.Services;
 using System;
 using System.Linq;
@@ -52,15 +54,14 @@ namespace Library.Tests
         public void UserRepository_AddGetUpdateDeleteUser_SuccessfulOperations()
         {
             var userRepository = new UserRepository();
-            var user = new User
-            {
-                Id = 1,
-                Name = "Test User",
-                Email = "test@example.com",
-                PhoneNumber = "555-1234",
-                Type = UserType.Patron,
-                RegistrationDate = DateTime.Now
-            };
+            var user = UserFactory.CreateUser(
+                1,
+                "Test User",
+                "test@example.com",
+                "555-1234",
+                UserType.Patron,
+                DateTime.Now
+            );
 
             userRepository.AddUser(user);
             var users = userRepository.GetAllUsers();
@@ -70,8 +71,15 @@ namespace Library.Tests
             Assert.IsNotNull(retrievedUser);
             Assert.AreEqual("Test User", retrievedUser.Name);
 
-            user.Name = "Updated Name";
-            userRepository.UpdateUser(user);
+            var updatedUser = UserFactory.CreateUser(
+                1,
+                "Updated Name",
+                "test@example.com",
+                "555-1234",
+                UserType.Patron,
+                DateTime.Now
+            );
+            userRepository.UpdateUser(updatedUser);
             retrievedUser = userRepository.GetUserById(1);
             Assert.AreEqual("Updated Name", retrievedUser.Name);
 
@@ -84,16 +92,15 @@ namespace Library.Tests
         public void CatalogRepository_AddGetUpdateDeleteBook_SuccessfulOperations()
         {
             var catalogRepository = new CatalogRepository();
-            var book = new Book
-            {
-                ISBN = "TEST-ISBN",
-                Title = "Test Book",
-                Author = "Test Author",
-                Publisher = "Test Publisher",
-                PublicationYear = 2023,
-                Genre = "Test Genre",
-                Description = "Test Description"
-            };
+            var book = BookFactory.CreateBook(
+                "TEST-ISBN",
+                "Test Book",
+                "Test Author",
+                "Test Publisher",
+                2023,
+                "Test Genre",
+                "Test Description"
+            );
 
             catalogRepository.AddBook(book);
             var books = catalogRepository.GetAllBooks();
@@ -103,8 +110,16 @@ namespace Library.Tests
             Assert.IsNotNull(retrievedBook);
             Assert.AreEqual("Test Book", retrievedBook.Title);
 
-            book.Title = "Updated Title";
-            catalogRepository.UpdateBook(book);
+            var updatedBook = BookFactory.CreateBook(
+                "TEST-ISBN",
+                "Updated Title",
+                "Test Author",
+                "Test Publisher",
+                2023,
+                "Test Genre",
+                "Test Description"
+            );
+            catalogRepository.UpdateBook(updatedBook);
             retrievedBook = catalogRepository.GetBookById("TEST-ISBN");
             Assert.AreEqual("Updated Title", retrievedBook.Title);
 
@@ -117,14 +132,13 @@ namespace Library.Tests
         public void StateRepository_AddGetUpdateDeleteBookCopy_SuccessfulOperations()
         {
             var stateRepository = new StateRepository();
-            var bookCopy = new BookCopy
-            {
-                Id = 1,
-                ISBN = "TEST-ISBN",
-                Status = BookStatus.Available,
-                AcquisitionDate = DateTime.Now,
-                Location = "Test Location"
-            };
+            var bookCopy = BookCopyFactory.CreateBookCopy(
+                1,
+                "TEST-ISBN",
+                BookStatus.Available,
+                DateTime.Now,
+                "Test Location"
+            );
 
             stateRepository.AddBookCopy(bookCopy);
             var bookCopies = stateRepository.GetAllBookCopies();
@@ -134,8 +148,14 @@ namespace Library.Tests
             Assert.IsNotNull(retrievedBookCopy);
             Assert.AreEqual("Test Location", retrievedBookCopy.Location);
 
-            bookCopy.Location = "Updated Location";
-            stateRepository.UpdateBookCopy(bookCopy);
+            var updatedBookCopy = BookCopyFactory.CreateBookCopy(
+                1,
+                "TEST-ISBN",
+                BookStatus.Available,
+                DateTime.Now,
+                "Updated Location"
+            );
+            stateRepository.UpdateBookCopy(updatedBookCopy);
             retrievedBookCopy = stateRepository.GetBookCopyById(1);
             Assert.AreEqual("Updated Location", retrievedBookCopy.Location);
 
@@ -148,15 +168,15 @@ namespace Library.Tests
         public void EventRepository_AddGetEvents_SuccessfulOperations()
         {
             var eventRepository = new EventRepository();
-            var libraryEvent = new LibraryEvent
-            {
-                Id = 1,
-                Type = EventType.BookAdded,
-                ISBN = "TEST-ISBN",
-                BookCopyId = 1,
-                Timestamp = DateTime.Now,
-                Description = "Test Event"
-            };
+            var libraryEvent = LibraryEventFactory.CreateEvent(
+                1,
+                EventType.BookAdded,
+                DateTime.Now,
+                "Test Event",
+                null,
+                "TEST-ISBN",
+                1
+            );
 
             eventRepository.AddEvent(libraryEvent);
             var events = eventRepository.GetAllEvents();
@@ -180,37 +200,34 @@ namespace Library.Tests
             var dataRepository = new DataRepository(userRepository, catalogRepository, stateRepository, eventRepository);
             var libraryService = new LibraryService(dataRepository);
 
-            var user = new User
-            {
-                Id = 1,
-                Name = "Test User",
-                Email = "test@example.com",
-                PhoneNumber = "555-1234",
-                Type = UserType.Patron,
-                RegistrationDate = DateTime.Now
-            };
+            var user = UserFactory.CreateUser(
+                1,
+                "Test User",
+                "test@example.com",
+                "555-1234",
+                UserType.Patron,
+                DateTime.Now
+            );
             userRepository.AddUser(user);
 
-            var book = new Book
-            {
-                ISBN = "TEST-ISBN",
-                Title = "Test Book",
-                Author = "Test Author",
-                Publisher = "Test Publisher",
-                PublicationYear = 2023,
-                Genre = "Test Genre",
-                Description = "Test Description"
-            };
+            var book = BookFactory.CreateBook(
+                "TEST-ISBN",
+                "Test Book",
+                "Test Author",
+                "Test Publisher",
+                2023,
+                "Test Genre",
+                "Test Description"
+            );
             catalogRepository.AddBook(book);
 
-            var bookCopy = new BookCopy
-            {
-                Id = 1,
-                ISBN = "TEST-ISBN",
-                Status = BookStatus.Available,
-                AcquisitionDate = DateTime.Now,
-                Location = "Test Location"
-            };
+            var bookCopy = BookCopyFactory.CreateBookCopy(
+                1,
+                "TEST-ISBN",
+                BookStatus.Available,
+                DateTime.Now,
+                "Test Location"
+            );
             stateRepository.AddBookCopy(bookCopy);
 
             var dueDate = DateTime.Now.AddDays(14);
@@ -260,28 +277,36 @@ namespace Library.Tests
             var dataRepository = new DataRepository(userRepository, catalogRepository, stateRepository, eventRepository);
             var libraryService = new LibraryService(dataRepository);
 
-            userRepository.AddUser(new User { Id = 1, Name = "User 1" });
-            userRepository.AddUser(new User { Id = 2, Name = "User 2" });
+            var user1 = UserFactory.CreateUser(1, "User 1", "user1@example.com", "555-1111", UserType.Patron, DateTime.Now);
+            var user2 = UserFactory.CreateUser(2, "User 2", "user2@example.com", "555-2222", UserType.Patron, DateTime.Now);
+            userRepository.AddUser(user1);
+            userRepository.AddUser(user2);
 
-            catalogRepository.AddBook(new Book { ISBN = "TEST-ISBN", Title = "Test Book" });
+            var book = BookFactory.CreateBook("TEST-ISBN", "Test Book", "Test Author", "Test Publisher", 2023, "Test Genre", "Test Description");
+            catalogRepository.AddBook(book);
 
-            stateRepository.AddBookCopy(new BookCopy
-            {
-                Id = 1,
-                ISBN = "TEST-ISBN",
-                Status = BookStatus.CheckedOut,
-                CurrentBorrowerId = 1,
-                DueDate = DateTime.Now.AddDays(-1)
-            });
+            var bookCopy1 = BookCopyFactory.CreateBookCopy(
+                1,
+                "TEST-ISBN",
+                BookStatus.CheckedOut,
+                DateTime.Now.AddDays(-10),
+                "Shelf A",
+                1,
+                DateTime.Now.AddDays(-1)  // Overdue
+            );
 
-            stateRepository.AddBookCopy(new BookCopy
-            {
-                Id = 2,
-                ISBN = "TEST-ISBN",
-                Status = BookStatus.CheckedOut,
-                CurrentBorrowerId = 2,
-                DueDate = DateTime.Now.AddDays(5) 
-            });
+            var bookCopy2 = BookCopyFactory.CreateBookCopy(
+                2,
+                "TEST-ISBN",
+                BookStatus.CheckedOut,
+                DateTime.Now.AddDays(-10),
+                "Shelf B",
+                2,
+                DateTime.Now.AddDays(5)   // Not overdue
+            );
+
+            stateRepository.AddBookCopy(bookCopy1);
+            stateRepository.AddBookCopy(bookCopy2);
 
             var usersWithOverdueBooks = libraryService.GetUsersWithOverdueBooks().ToList();
 

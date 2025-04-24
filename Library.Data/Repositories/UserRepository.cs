@@ -1,20 +1,34 @@
-﻿using System;
+﻿using Library.Data.Interfaces;
+using Library.Data.Interfaces.Models;
+using Library.Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Library.Data.Interfaces;
-using Library.Data.Models;
 
 namespace Library.Data.Repositories
 {
     public class UserRepository : IUserRepository
     {
         private readonly List<User> _users;
-        private readonly IModelFactory _modelFactory;
 
-        public UserRepository(List<User> initialUsers = null)
+        public UserRepository(IEnumerable<IUser> initialUsers = null)
         {
-            _users = initialUsers ?? new List<User>();
-            _modelFactory = new Factories.ModelFactory();
+            _users = new List<User>();
+            if (initialUsers != null)
+            {
+                foreach (var user in initialUsers)
+                {
+                    _users.Add(new User
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber,
+                        Type = user.Type,
+                        RegistrationDate = user.RegistrationDate
+                    });
+                }
+            }
         }
 
         public IEnumerable<IUser> GetAllUsers() => _users.Cast<IUser>().ToList();
@@ -28,22 +42,17 @@ namespace Library.Data.Repositories
                 throw new ArgumentException($"User with ID {user.Id} already exists.");
             }
 
-            if (user is User concreteUser)
+            var internalUser = new User
             {
-                _users.Add(concreteUser);
-            }
-            else
-            {
-                _users.Add(new User
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Type = user.Type,
-                    RegistrationDate = user.RegistrationDate
-                });
-            }
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Type = user.Type,
+                RegistrationDate = user.RegistrationDate
+            };
+
+            _users.Add(internalUser);
         }
 
         public void UpdateUser(IUser user)
@@ -56,22 +65,17 @@ namespace Library.Data.Repositories
 
             _users.Remove(existingUser);
 
-            if (user is User concreteUser)
+            var updatedUser = new User
             {
-                _users.Add(concreteUser);
-            }
-            else
-            {
-                _users.Add(new User
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Type = user.Type,
-                    RegistrationDate = user.RegistrationDate
-                });
-            }
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Type = user.Type,
+                RegistrationDate = user.RegistrationDate
+            };
+
+            _users.Add(updatedUser);
         }
 
         public void DeleteUser(int id)
