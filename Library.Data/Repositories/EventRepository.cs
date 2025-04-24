@@ -1,36 +1,56 @@
-﻿using Library.Data.Interfaces;
-using Library.Data.Models;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Library.Data.Interfaces;
+using Library.Data.Models;
 
 namespace Library.Data.Repositories
 {
     public class EventRepository : IEventRepository
     {
         private readonly List<LibraryEvent> _events;
+        private readonly IModelFactory _modelFactory;
 
         public EventRepository(List<LibraryEvent> initialEvents = null)
         {
             _events = initialEvents ?? new List<LibraryEvent>();
+            _modelFactory = new Factories.ModelFactory();
         }
 
-        public IEnumerable<LibraryEvent> GetAllEvents() => _events.ToList();
+        public IEnumerable<ILibraryEvent> GetAllEvents() => _events.Cast<ILibraryEvent>().ToList();
 
-        public LibraryEvent GetEventById(int id) => _events.FirstOrDefault(e => e.Id == id);
+        public ILibraryEvent GetEventById(int id) => _events.FirstOrDefault(e => e.Id == id);
 
-        public IEnumerable<LibraryEvent> GetEventsByUser(int userId) =>
-            _events.Where(e => e.UserId == userId).ToList();
+        public IEnumerable<ILibraryEvent> GetEventsByUser(int userId) =>
+            _events.Where(e => e.UserId == userId).Cast<ILibraryEvent>().ToList();
 
-        public IEnumerable<LibraryEvent> GetEventsByBook(string isbn) =>
-            _events.Where(e => e.ISBN == isbn).ToList();
+        public IEnumerable<ILibraryEvent> GetEventsByBook(string isbn) =>
+            _events.Where(e => e.ISBN == isbn).Cast<ILibraryEvent>().ToList();
 
-        public void AddEvent(LibraryEvent libraryEvent)
+        public void AddEvent(ILibraryEvent libraryEvent)
         {
             if (_events.Any(e => e.Id == libraryEvent.Id))
             {
                 throw new ArgumentException($"Event with ID {libraryEvent.Id} already exists.");
             }
-            _events.Add(libraryEvent);
+
+            if (libraryEvent is LibraryEvent concreteEvent)
+            {
+                _events.Add(concreteEvent);
+            }
+            else
+            {
+                _events.Add(new LibraryEvent
+                {
+                    Id = libraryEvent.Id,
+                    Type = libraryEvent.Type,
+                    UserId = libraryEvent.UserId,
+                    ISBN = libraryEvent.ISBN,
+                    BookCopyId = libraryEvent.BookCopyId,
+                    Timestamp = libraryEvent.Timestamp,
+                    Description = libraryEvent.Description
+                });
+            }
         }
     }
 }
