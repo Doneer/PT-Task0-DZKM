@@ -1,36 +1,37 @@
-﻿using Library.Data.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Library.Data.Interfaces;
+using Library.Data.Models;
 
 namespace Library.Logic.Interfaces
 {
     public interface ILibraryService
     {
-        IEnumerable<User> GetAllUsers();
-        User GetUserById(int id);
-        void RegisterUser(User user);
-        void UpdateUserInformation(User user);
+        IEnumerable<IUser> GetAllUsers();
+        IUser GetUserById(int id);
+        void RegisterUser(IUser user);
+        void UpdateUserInformation(IUser user);
         void RemoveUser(int id);
 
-        IEnumerable<Book> GetAllBooks();
-        Book GetBookByIsbn(string isbn);
-        void AddBook(Book book);
-        void UpdateBookInformation(Book book);
+        IEnumerable<IBook> GetAllBooks();
+        IBook GetBookByIsbn(string isbn);
+        void AddBook(IBook book);
+        void UpdateBookInformation(IBook book);
         void RemoveBook(string isbn);
 
-        IEnumerable<BookCopy> GetAllBookCopies();
-        BookCopy GetBookCopyById(int id);
-        IEnumerable<BookCopy> GetAvailableBooks();
-        IEnumerable<BookCopy> GetCheckedOutBooks();
-        void AddBookCopy(BookCopy bookCopy);
+        IEnumerable<IBookCopy> GetAllBookCopies();
+        IBookCopy GetBookCopyById(int id);
+        IEnumerable<IBookCopy> GetAvailableBooks();
+        IEnumerable<IBookCopy> GetCheckedOutBooks();
+        void AddBookCopy(IBookCopy bookCopy);
 
         bool BorrowBook(int userId, int bookCopyId, DateTime dueDate);
         bool ReturnBook(int bookCopyId);
-        IEnumerable<BookCopy> GetBorrowedBooksByUser(int userId);
-        IEnumerable<User> GetUsersWithOverdueBooks();
+        IEnumerable<IBookCopy> GetBorrowedBooksByUser(int userId);
+        IEnumerable<IUser> GetUsersWithOverdueBooks();
 
-        IEnumerable<LibraryEvent> GetAllEvents();
-        IEnumerable<LibraryEvent> GetEventsByUser(int userId);
-        IEnumerable<LibraryEvent> GetEventsByBook(string isbn);
+        IEnumerable<ILibraryEvent> GetAllEvents();
+        IEnumerable<ILibraryEvent> GetEventsByUser(int userId);
+        IEnumerable<ILibraryEvent> GetEventsByBook(string isbn);
     }
 }

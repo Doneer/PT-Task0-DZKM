@@ -1,50 +1,53 @@
-﻿using Library.Data.Interfaces;
-using Library.Data.Models;
-using Library.Logic.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Library.Data.Factories;
+using Library.Data.Interfaces;
+using Library.Data.Models;
+using Library.Logic.Interfaces;
 
 namespace Library.Logic.Services
 {
     public class LibraryService : ILibraryService
     {
         private readonly IDataRepository _dataRepository;
-
+        private readonly IModelFactory _modelFactory;
 
         public LibraryService(IDataRepository dataRepository)
         {
             _dataRepository = dataRepository;
+            _modelFactory = new Data.Factories.ModelFactory();
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public IEnumerable<IUser> GetAllUsers()
         {
             return _dataRepository.Users.GetAllUsers();
         }
 
-        public User GetUserById(int id)
+        public IUser GetUserById(int id)
         {
             return _dataRepository.Users.GetUserById(id);
         }
 
-        public void RegisterUser(User user)
+        public void RegisterUser(IUser user)
         {
             user.RegistrationDate = DateTime.Now;
             _dataRepository.Users.AddUser(user);
 
-            var newEvent = new LibraryEvent
-            {
-                Id = GetNextEventId(),
-                Type = EventType.UserRegistered,
-                UserId = user.Id,
-                Timestamp = DateTime.Now,
-                Description = $"User {user.Name} registered"
-            };
+            var newEvent = _modelFactory.CreateLibraryEvent(
+                GetNextEventId(),
+                EventType.UserRegistered,
+                user.Id,
+                null,
+                null,
+                DateTime.Now,
+                $"User {user.Name} registered"
+            );
 
             _dataRepository.Events.AddEvent(newEvent);
         }
 
-        public void UpdateUserInformation(User user)
+        public void UpdateUserInformation(IUser user)
         {
             _dataRepository.Users.UpdateUser(user);
         }
@@ -61,34 +64,35 @@ namespace Library.Logic.Services
 
             _dataRepository.Users.DeleteUser(id);
 
-            var newEvent = new LibraryEvent
-            {
-                Id = GetNextEventId(),
-                Type = EventType.UserRemoved,
-                UserId = id,
-                Timestamp = DateTime.Now,
-                Description = $"User {user.Name} removed"
-            };
+            var newEvent = _modelFactory.CreateLibraryEvent(
+                GetNextEventId(),
+                EventType.UserRemoved,
+                id,
+                null,
+                null,
+                DateTime.Now,
+                $"User {user.Name} removed"
+            );
 
             _dataRepository.Events.AddEvent(newEvent);
         }
 
-        public IEnumerable<Book> GetAllBooks()
+        public IEnumerable<IBook> GetAllBooks()
         {
             return _dataRepository.Catalog.GetAllBooks();
         }
 
-        public Book GetBookByIsbn(string isbn)
+        public IBook GetBookByIsbn(string isbn)
         {
             return _dataRepository.Catalog.GetBookById(isbn);
         }
 
-        public void AddBook(Book book)
+        public void AddBook(IBook book)
         {
             _dataRepository.Catalog.AddBook(book);
         }
 
-        public void UpdateBookInformation(Book book)
+        public void UpdateBookInformation(IBook book)
         {
             _dataRepository.Catalog.UpdateBook(book);
         }
@@ -109,27 +113,27 @@ namespace Library.Logic.Services
             _dataRepository.Catalog.DeleteBook(isbn);
         }
 
-        public IEnumerable<BookCopy> GetAllBookCopies()
+        public IEnumerable<IBookCopy> GetAllBookCopies()
         {
             return _dataRepository.State.GetAllBookCopies();
         }
 
-        public BookCopy GetBookCopyById(int id)
+        public IBookCopy GetBookCopyById(int id)
         {
             return _dataRepository.State.GetBookCopyById(id);
         }
 
-        public IEnumerable<BookCopy> GetAvailableBooks()
+        public IEnumerable<IBookCopy> GetAvailableBooks()
         {
             return _dataRepository.State.GetAvailableBooks();
         }
 
-        public IEnumerable<BookCopy> GetCheckedOutBooks()
+        public IEnumerable<IBookCopy> GetCheckedOutBooks()
         {
             return _dataRepository.State.GetCheckedOutBooks();
         }
 
-        public void AddBookCopy(BookCopy bookCopy)
+        public void AddBookCopy(IBookCopy bookCopy)
         {
             var book = _dataRepository.Catalog.GetBookById(bookCopy.ISBN);
             if (book == null)
@@ -139,15 +143,15 @@ namespace Library.Logic.Services
             bookCopy.Status = BookStatus.Available;
             _dataRepository.State.AddBookCopy(bookCopy);
 
-            var newEvent = new LibraryEvent
-            {
-                Id = GetNextEventId(),
-                Type = EventType.BookAdded,
-                ISBN = bookCopy.ISBN,
-                BookCopyId = bookCopy.Id,
-                Timestamp = DateTime.Now,
-                Description = $"Added new copy of {book.Title}"
-            };
+            var newEvent = _modelFactory.CreateLibraryEvent(
+                GetNextEventId(),
+                EventType.BookAdded,
+                null,
+                bookCopy.ISBN,
+                bookCopy.Id,
+                DateTime.Now,
+                $"Added new copy of {book.Title}"
+            );
 
             _dataRepository.Events.AddEvent(newEvent);
         }
@@ -169,21 +173,28 @@ namespace Library.Logic.Services
             if (book == null)
                 throw new InvalidOperationException($"Book with ISBN {bookCopy.ISBN} not found in catalog");
 
-            bookCopy.Status = BookStatus.CheckedOut;
-            bookCopy.CurrentBorrowerId = userId;
-            bookCopy.DueDate = dueDate;
-            _dataRepository.State.UpdateBookCopy(bookCopy);
+            // Create a new BookCopy with updated properties
+            var updatedBookCopy = _modelFactory.CreateBookCopy(
+                bookCopy.Id,
+                bookCopy.ISBN,
+                BookStatus.CheckedOut,
+                bookCopy.AcquisitionDate,
+                bookCopy.Location,
+                userId,
+                dueDate
+            );
 
-            var newEvent = new LibraryEvent
-            {
-                Id = GetNextEventId(),
-                Type = EventType.BookBorrowed,
-                UserId = userId,
-                ISBN = bookCopy.ISBN,
-                BookCopyId = bookCopyId,
-                Timestamp = DateTime.Now,
-                Description = $"{user.Name} borrowed {book.Title}"
-            };
+            _dataRepository.State.UpdateBookCopy(updatedBookCopy);
+
+            var newEvent = _modelFactory.CreateLibraryEvent(
+                GetNextEventId(),
+                EventType.BookBorrowed,
+                userId,
+                bookCopy.ISBN,
+                bookCopyId,
+                DateTime.Now,
+                $"{user.Name} borrowed {book.Title}"
+            );
 
             _dataRepository.Events.AddEvent(newEvent);
 
@@ -203,36 +214,40 @@ namespace Library.Logic.Services
             var userId = bookCopy.CurrentBorrowerId;
             var user = _dataRepository.Users.GetUserById(userId.Value);
 
-            bookCopy.Status = BookStatus.Available;
-            bookCopy.CurrentBorrowerId = null;
-            bookCopy.DueDate = null;
-            _dataRepository.State.UpdateBookCopy(bookCopy);
+            // Create a new BookCopy with updated properties
+            var updatedBookCopy = _modelFactory.CreateBookCopy(
+                bookCopy.Id,
+                bookCopy.ISBN,
+                BookStatus.Available,
+                bookCopy.AcquisitionDate,
+                bookCopy.Location
+            );
 
-            var newEvent = new LibraryEvent
-            {
-                Id = GetNextEventId(),
-                Type = EventType.BookReturned,
-                UserId = userId,
-                ISBN = bookCopy.ISBN,
-                BookCopyId = bookCopyId,
-                Timestamp = DateTime.Now,
-                Description = $"{user.Name} returned {book.Title}"
-            };
+            _dataRepository.State.UpdateBookCopy(updatedBookCopy);
+
+            var newEvent = _modelFactory.CreateLibraryEvent(
+                GetNextEventId(),
+                EventType.BookReturned,
+                userId,
+                bookCopy.ISBN,
+                bookCopyId,
+                DateTime.Now,
+                $"{user.Name} returned {book.Title}"
+            );
 
             _dataRepository.Events.AddEvent(newEvent);
 
             if (bookCopy.DueDate.HasValue && bookCopy.DueDate.Value < DateTime.Now)
             {
-                var overdueEvent = new LibraryEvent
-                {
-                    Id = GetNextEventId(),
-                    Type = EventType.FineAssessed,
-                    UserId = userId,
-                    ISBN = bookCopy.ISBN,
-                    BookCopyId = bookCopyId,
-                    Timestamp = DateTime.Now,
-                    Description = $"Fine assessed for overdue book {book.Title}"
-                };
+                var overdueEvent = _modelFactory.CreateLibraryEvent(
+                    GetNextEventId(),
+                    EventType.FineAssessed,
+                    userId,
+                    bookCopy.ISBN,
+                    bookCopyId,
+                    DateTime.Now,
+                    $"Fine assessed for overdue book {book.Title}"
+                );
 
                 _dataRepository.Events.AddEvent(overdueEvent);
             }
@@ -240,14 +255,14 @@ namespace Library.Logic.Services
             return true;
         }
 
-        public IEnumerable<BookCopy> GetBorrowedBooksByUser(int userId)
+        public IEnumerable<IBookCopy> GetBorrowedBooksByUser(int userId)
         {
             return _dataRepository.State.GetCheckedOutBooks()
                 .Where(bc => bc.CurrentBorrowerId == userId)
                 .ToList();
         }
 
-        public IEnumerable<User> GetUsersWithOverdueBooks()
+        public IEnumerable<IUser> GetUsersWithOverdueBooks()
         {
             var today = DateTime.Now;
             var overdueBookCopies = _dataRepository.State.GetCheckedOutBooks()
@@ -259,17 +274,17 @@ namespace Library.Logic.Services
             return userIds.Select(id => _dataRepository.Users.GetUserById(id)).ToList();
         }
 
-        public IEnumerable<LibraryEvent> GetAllEvents()
+        public IEnumerable<ILibraryEvent> GetAllEvents()
         {
             return _dataRepository.Events.GetAllEvents();
         }
 
-        public IEnumerable<LibraryEvent> GetEventsByUser(int userId)
+        public IEnumerable<ILibraryEvent> GetEventsByUser(int userId)
         {
             return _dataRepository.Events.GetEventsByUser(userId);
         }
 
-        public IEnumerable<LibraryEvent> GetEventsByBook(string isbn)
+        public IEnumerable<ILibraryEvent> GetEventsByBook(string isbn)
         {
             return _dataRepository.Events.GetEventsByBook(isbn);
         }
