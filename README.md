@@ -1,4 +1,4 @@
-# Programming Technology Lab #1
+# Programming Technology Lab #2
 
 ## Team
 

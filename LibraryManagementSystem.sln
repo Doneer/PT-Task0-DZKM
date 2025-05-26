@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.WPF", "Library.WPF\Library.WPF.csproj", "{FC8936C8-B6DF-44C2-ABE9-AF9EF545C3B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{D798A508-4E97-4F7A-B5D0-C64A5F8D2C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D798A508-4E97-4F7A-B5D0-C64A5F8D2C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D798A508-4E97-4F7A-B5D0-C64A5F8D2C94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8936C8-B6DF-44C2-ABE9-AF9EF545C3B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8936C8-B6DF-44C2-ABE9-AF9EF545C3B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8936C8-B6DF-44C2-ABE9-AF9EF545C3B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8936C8-B6DF-44C2-ABE9-AF9EF545C3B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

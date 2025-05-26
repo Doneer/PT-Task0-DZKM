@@ -1,0 +1,105 @@
+﻿<Window x:Class="Library.WPF.Views.BookEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Book Details" Height="500" Width="450"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="MinWidth" Value="80"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ISBN Field -->
+        <Label Grid.Row="0" Grid.Column="0" Content="ISBN:*"/>
+        <TextBox Grid.Row="0" Grid.Column="1" 
+                 Text="{Binding ISBN, UpdateSourceTrigger=PropertyChanged}" 
+                 x:Name="ISBNTextBox"/>
+
+        <!-- Title Field -->
+        <Label Grid.Row="1" Grid.Column="0" Content="Title:*"/>
+        <TextBox Grid.Row="1" Grid.Column="1" 
+                 Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                 x:Name="TitleTextBox"/>
+
+        <!-- Author Field -->
+        <Label Grid.Row="2" Grid.Column="0" Content="Author:*"/>
+        <TextBox Grid.Row="2" Grid.Column="1" 
+                 Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}"
+                 x:Name="AuthorTextBox"/>
+
+        <!-- Publisher Field -->
+        <Label Grid.Row="3" Grid.Column="0" Content="Publisher:"/>
+        <TextBox Grid.Row="3" Grid.Column="1" 
+                 Text="{Binding Publisher, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <!-- Publication Year Field -->
+        <Label Grid.Row="4" Grid.Column="0" Content="Year:*"/>
+        <TextBox Grid.Row="4" Grid.Column="1" 
+                 Text="{Binding PublicationYear, UpdateSourceTrigger=PropertyChanged}"
+                 x:Name="YearTextBox"/>
+
+        <!-- Genre Field -->
+        <Label Grid.Row="5" Grid.Column="0" Content="Genre:"/>
+        <TextBox Grid.Row="5" Grid.Column="1" 
+                 Text="{Binding Genre, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <!-- Description Field -->
+        <Label Grid.Row="6" Grid.Column="0" Content="Description:" VerticalAlignment="Top"/>
+        <TextBox Grid.Row="6" Grid.Column="1" 
+                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap" 
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 MinHeight="80"/>
+
+        <!-- Validation Messages -->
+        <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" 
+                   x:Name="ValidationMessage"
+                   Foreground="Red" 
+                   FontStyle="Italic"
+                   Margin="5"
+                   TextWrapping="Wrap"/>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <Button Content="Save" Click="Save_Click" IsDefault="True"/>
+            <Button Content="Cancel" Click="Cancel_Click" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
