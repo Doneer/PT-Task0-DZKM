@@ -28,4 +28,10 @@
     <ProjectReference Include="..\Library.WPF\Library.WPF.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Integration\" />
+    <Folder Include="WPF\" />
+  </ItemGroup>
+
 </Project>
