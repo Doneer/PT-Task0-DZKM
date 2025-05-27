@@ -28,8 +28,4 @@
     <ProjectReference Include="..\Library.WPF\Library.WPF.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="WPF\" />
-  </ItemGroup>
-
 </Project>
